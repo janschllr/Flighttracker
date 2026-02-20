@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Search, Plane } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export function SearchBar({ onSearch, isLoading }) {
     const [query, setQuery] = useState('');
+    const { t } = useLanguage();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,7 +22,7 @@ export function SearchBar({ onSearch, isLoading }) {
                 <input
                     type="text"
                     className="block w-full pl-11 pr-12 py-4 bg-white border-none rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all text-lg font-medium"
-                    placeholder="Enter flight number (e.g., LH123)"
+                    placeholder={t('searchPlaceholder')}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     disabled={isLoading}

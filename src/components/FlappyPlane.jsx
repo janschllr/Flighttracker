@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Plane } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export function FlappyPlane({ onClose }) {
     const canvasRef = useRef(null);
@@ -8,6 +9,7 @@ export function FlappyPlane({ onClose }) {
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(0);
     const [planeImg, setPlaneImg] = useState(null);
+    const { t } = useLanguage();
 
     // Game constants
     const GRAVITY = 0.15;
@@ -178,7 +180,7 @@ export function FlappyPlane({ onClose }) {
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'bold 24px monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText('CLICK TO FLY', canvas.width / 2, canvas.height / 2);
+                ctx.fillText(t('clickToFly'), canvas.width / 2, canvas.height / 2);
             }
 
             requestRef.current = requestAnimationFrame(loop);
@@ -242,9 +244,9 @@ export function FlappyPlane({ onClose }) {
                 {gameState === 'gameover' && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="bg-white/90 p-8 rounded-2xl text-center shadow-xl backdrop-blur">
-                            <h2 className="text-3xl font-black text-slate-900 mb-2">GAME OVER</h2>
-                            <p className="text-slate-500 font-bold mb-4">Score: {score}</p>
-                            <p className="text-slate-400 text-sm">Click or Space to Restart</p>
+                            <h2 className="text-3xl font-black text-slate-900 mb-2">{t('gameOver')}</h2>
+                            <p className="text-slate-500 font-bold mb-4">{t('score')}: {score}</p>
+                            <p className="text-slate-400 text-sm">{t('restartHint')}</p>
                         </div>
                     </div>
                 )}

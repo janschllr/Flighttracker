@@ -2,10 +2,13 @@ import React from 'react';
 import { Plane, QrCode } from 'lucide-react';
 import { format } from 'date-fns';
 import clsx from 'clsx';
+import { useLanguage } from '../i18n/LanguageContext';
 
 import { FlappyPlane } from './FlappyPlane';
 
 export function FlightTicket({ flight }) {
+    const { t, language } = useLanguage();
+
     if (!flight) return null;
 
     const now = new Date();
@@ -17,6 +20,18 @@ export function FlightTicket({ flight }) {
 
     const [isTorn, setIsTorn] = React.useState(false);
     const [showGame, setShowGame] = React.useState(false);
+
+    // Map API status to translated status
+    const statusMap = {
+        'On Time': t('statusOnTime'),
+        'In Air': t('statusInAir'),
+        'Arrived': t('statusArrived'),
+        'Cancelled': t('statusCancelled'),
+        'Delayed': t('statusDelayed'),
+        'Diverted': t('statusDiverted'),
+        'Unknown': t('statusUnknown'),
+    };
+    const translatedStatus = statusMap[flight.status] || flight.status;
 
     const handleTear = () => {
         setIsTorn(true);
@@ -50,12 +65,12 @@ export function FlightTicket({ flight }) {
                                 </div>
                                 <div>
                                     <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">{flight.airline}</h2>
-                                    <p className="text-slate-500 text-sm font-mono">Boarding Pass</p>
+                                    <p className="text-slate-500 text-sm font-mono">{t('boardingPass')}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="text-sm text-slate-400 uppercase tracking-wider font-bold">Class</div>
-                                <div className="text-xl font-black text-slate-900">Economy</div>
+                                <div className="text-sm text-slate-400 uppercase tracking-wider font-bold">{t('class')}</div>
+                                <div className="text-xl font-black text-slate-900">{t('economy')}</div>
                             </div>
                         </div>
 
@@ -102,7 +117,7 @@ export function FlightTicket({ flight }) {
                                         ? "bg-green-100 text-green-700 border-green-200"
                                         : "bg-red-100 text-red-700 border-red-200"
                                 )}>
-                                    {flight.status}
+                                    {translatedStatus}
                                 </div>
                             </div>
 
@@ -115,37 +130,37 @@ export function FlightTicket({ flight }) {
                         {/* Details Grid */}
                         <div className="grid grid-cols-4 gap-8">
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Flight</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('flight')}</div>
                                 <div className="text-xl font-black text-slate-900 font-mono">{flight.flightNumber}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Date</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('date')}</div>
                                 <div className="text-xl font-black text-slate-900">
                                     {format(new Date(flight.departure.scheduled), 'dd MMM')}
                                 </div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Time</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('time')}</div>
                                 <div className="text-xl font-black text-slate-900">
                                     {format(new Date(flight.departure.scheduled), 'HH:mm')}
                                 </div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Gate</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('gate')}</div>
                                 <div className="text-xl font-black text-slate-900">{flight.departure.gate}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Seat</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('seat')}</div>
                                 <div className="text-xl font-black text-slate-900">14A</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Boarding</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('boarding')}</div>
                                 <div className="text-xl font-black text-slate-900">
                                     {format(new Date(new Date(flight.departure.scheduled).getTime() - 45 * 60000), 'HH:mm')}
                                 </div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">ETA</div>
+                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('eta')}</div>
                                 <div className="text-xl font-black text-slate-900">
                                     {flight.arrival.estimated ? format(new Date(flight.arrival.estimated), 'HH:mm') : '--:--'}
                                 </div>
@@ -164,7 +179,7 @@ export function FlightTicket({ flight }) {
                         {/* Tear hint */}
                         {!isTorn && (
                             <div className="absolute -left-3 top-1/2 -translate-y-1/2 -rotate-90 text-slate-400 text-[10px] font-mono tracking-widest opacity-50 pointer-events-none">
-                                TEAR HERE
+                                {t('tearHere')}
                             </div>
                         )}
                         {/* Cutout circles for perforation effect */}
@@ -172,23 +187,23 @@ export function FlightTicket({ flight }) {
                         <div className="absolute -left-4 bottom-0 w-8 h-8 bg-slate-950 rounded-full translate-y-[50%]" />
 
                         <div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-6 uppercase tracking-wider">Passenger Ticket</h3>
+                            <h3 className="text-lg font-bold text-slate-900 mb-6 uppercase tracking-wider">{t('passengerTicket')}</h3>
 
                             <div className="space-y-4">
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400 text-sm font-medium">Flight</span>
+                                    <span className="text-slate-400 text-sm font-medium">{t('flight')}</span>
                                     <span className="text-slate-900 font-bold font-mono">{flight.flightNumber}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400 text-sm font-medium">Date</span>
+                                    <span className="text-slate-400 text-sm font-medium">{t('date')}</span>
                                     <span className="text-slate-900 font-bold">{format(new Date(flight.departure.scheduled), 'dd MMM')}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400 text-sm font-medium">Gate</span>
+                                    <span className="text-slate-400 text-sm font-medium">{t('gate')}</span>
                                     <span className="text-slate-900 font-bold">{flight.departure.gate}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400 text-sm font-medium">Seat</span>
+                                    <span className="text-slate-400 text-sm font-medium">{t('seat')}</span>
                                     <span className="text-slate-900 font-bold">14A</span>
                                 </div>
                             </div>
@@ -198,12 +213,12 @@ export function FlightTicket({ flight }) {
                             <div className="flex justify-between items-end">
                                 <div className="text-left">
                                     <div className="text-3xl font-black text-slate-900">{flight.origin.code}</div>
-                                    <div className="text-slate-400 text-xs font-bold">Origin</div>
+                                    <div className="text-slate-400 text-xs font-bold">{t('origin')}</div>
                                 </div>
                                 <Plane className="h-5 w-5 text-slate-300 mb-2" />
                                 <div className="text-right">
                                     <div className="text-3xl font-black text-slate-900">{flight.destination.code}</div>
-                                    <div className="text-slate-400 text-xs font-bold">Dest</div>
+                                    <div className="text-slate-400 text-xs font-bold">{t('dest')}</div>
                                 </div>
                             </div>
                         </div>
