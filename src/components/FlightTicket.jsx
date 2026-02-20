@@ -11,12 +11,23 @@ export function FlightTicket({ flight }) {
 
     if (!flight) return null;
 
+    // Calculate flight progress using best available times
     const now = new Date();
-    const departureTime = new Date(flight.departure.scheduled);
-    const arrivalTime = new Date(flight.arrival.scheduled);
+    const departureTime = new Date(flight.departure.actual || flight.departure.estimated || flight.departure.scheduled);
+    const arrivalTime = new Date(flight.arrival.actual || flight.arrival.estimated || flight.arrival.scheduled);
     const totalDuration = arrivalTime - departureTime;
-    const elapsed = now - departureTime;
-    const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+
+    let progress;
+    if (flight.status === 'Arrived') {
+        progress = 100;
+    } else if (flight.status === 'On Time' && now < departureTime) {
+        progress = 0;
+    } else if (totalDuration <= 0) {
+        progress = 0;
+    } else {
+        const elapsed = now - departureTime;
+        progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+    }
 
     const [isTorn, setIsTorn] = React.useState(false);
     const [showGame, setShowGame] = React.useState(false);

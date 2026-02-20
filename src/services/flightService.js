@@ -42,12 +42,15 @@ export const searchFlight = async (flightNumber) => {
             },
             departure: {
                 scheduled: flight.departure.scheduled,
+                estimated: flight.departure.estimated,
+                actual: flight.departure.actual,
                 gate: flight.departure.gate || 'TBD',
                 terminal: flight.departure.terminal || 'TBD'
             },
             arrival: {
                 scheduled: flight.arrival.scheduled,
                 estimated: flight.arrival.estimated,
+                actual: flight.arrival.actual,
                 gate: flight.arrival.gate || 'TBD',
                 terminal: flight.arrival.terminal || 'TBD'
             },
