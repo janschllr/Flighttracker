@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Search, Plane } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
-export function SearchBar({ onSearch, isLoading }) {
-    const [query, setQuery] = useState('');
+export function SearchBar({ onSearch, isLoading, initialValue = '' }) {
+    const [query, setQuery] = useState(initialValue);
     const { t } = useLanguage();
 
     const handleSubmit = (e) => {

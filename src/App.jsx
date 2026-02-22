@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { FlightTicket } from './components/FlightTicket';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -6,12 +6,38 @@ import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 import { searchFlight } from './services/flightService';
 import { Plane, AlertCircle } from 'lucide-react';
 
+const CACHE_KEY = 'flighttracker-flight';
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function saveToCache(flightNumber, data) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify({
+    flightNumber: flightNumber.toUpperCase(),
+    data,
+    timestamp: Date.now(),
+  }));
+}
+
+function loadFromCache(flightNumber) {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { flightNumber: cached, data, timestamp } = JSON.parse(raw);
+    if (cached !== flightNumber.toUpperCase()) return null;
+    if (Date.now() - timestamp > CACHE_TTL) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 function AppContent() {
   const [flight, setFlight] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
   const { t } = useLanguage();
+
+  const initialFlight = new URLSearchParams(window.location.search).get('flight') ?? '';
 
   const handleSearch = async (flightNumber) => {
     setLoading(true);
@@ -23,6 +49,10 @@ function AppContent() {
       const result = await searchFlight(flightNumber);
       if (result) {
         setFlight(result);
+        const url = new URL(window.location);
+        url.searchParams.set('flight', flightNumber.toUpperCase());
+        history.pushState({}, '', url);
+        saveToCache(flightNumber, result);
       } else {
         setError(t('flightNotFound')(flightNumber));
       }
@@ -41,6 +71,17 @@ function AppContent() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!initialFlight) return;
+    const cached = loadFromCache(initialFlight);
+    if (cached) {
+      setFlight(cached);
+      setHasSearched(true);
+    } else {
+      handleSearch(initialFlight);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500 selection:text-white">
@@ -63,7 +104,7 @@ function AppContent() {
         </div>
 
         <div className="relative z-10">
-          <SearchBar onSearch={handleSearch} isLoading={loading} />
+          <SearchBar onSearch={handleSearch} isLoading={loading} initialValue={initialFlight} />
 
           {error && (
             <div className="mt-8 max-w-md mx-auto p-4 bg-red-900/20 border border-red-900/50 rounded-2xl flex items-start gap-3 text-red-400 animate-fade-in">
