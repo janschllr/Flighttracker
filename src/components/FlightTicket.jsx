@@ -58,13 +58,13 @@ export function FlightTicket({ flight }) {
                     {/* Left Side (Main Ticket) */}
                     <div className="flex-1 p-8 relative border-r-2 border-dashed border-slate-300/50 z-10 bg-[#f4f1ea] rounded-3xl md:rounded-r-none md:rounded-l-3xl shadow-2xl">
                         {/* Cutout circles for perforation effect */}
-                        <div className="absolute -right-4 top-0 w-8 h-8 bg-slate-950 rounded-full translate-y-[-50%]" />
-                        <div className="absolute -right-4 bottom-0 w-8 h-8 bg-slate-950 rounded-full translate-y-[50%]" />
+                        <div className="absolute -right-4 top-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[-50%]" />
+                        <div className="absolute -right-4 bottom-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[50%]" />
 
                         {/* Perforation Holes */}
                         <div className="absolute right-[-5px] top-4 bottom-4 flex flex-col justify-between items-center z-10 pointer-events-none">
                             {[...Array(12)].map((_, i) => (
-                                <div key={i} className="w-2 h-2 rounded-full bg-slate-950" />
+                                <div key={i} className="w-2 h-2 rounded-full bg-slate-100 dark:bg-slate-950" />
                             ))}
                         </div>
 
@@ -194,8 +194,8 @@ export function FlightTicket({ flight }) {
                             </div>
                         )}
                         {/* Cutout circles for perforation effect */}
-                        <div className="absolute -left-4 top-0 w-8 h-8 bg-slate-950 rounded-full translate-y-[-50%]" />
-                        <div className="absolute -left-4 bottom-0 w-8 h-8 bg-slate-950 rounded-full translate-y-[50%]" />
+                        <div className="absolute -left-4 top-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[-50%]" />
+                        <div className="absolute -left-4 bottom-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[50%]" />
 
                         <div>
                             <h3 className="text-lg font-bold text-slate-900 mb-6 uppercase tracking-wider">{t('passengerTicket')}</h3>

@@ -46,7 +46,7 @@ export function SearchBar({ onSearch, isLoading, initialValue = '', recentFlight
                             key={f}
                             onClick={() => onSearch(f)}
                             disabled={isLoading}
-                            className="px-3 py-1 text-sm font-medium bg-white/10 hover:bg-white/20 text-slate-300 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1 text-sm font-medium bg-slate-900/10 hover:bg-slate-900/20 text-slate-600 dark:bg-white/10 dark:hover:bg-white/20 dark:text-slate-300 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {f}
                         </button>
