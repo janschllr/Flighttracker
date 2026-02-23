@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Plane } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
-export function SearchBar({ onSearch, isLoading, initialValue = '' }) {
+export function SearchBar({ onSearch, isLoading, initialValue = '', recentFlights = [] }) {
     const [query, setQuery] = useState(initialValue);
     const { t } = useLanguage();
 
@@ -39,6 +39,20 @@ export function SearchBar({ onSearch, isLoading, initialValue = '' }) {
                     )}
                 </button>
             </form>
+            {recentFlights.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 justify-center">
+                    {recentFlights.map(f => (
+                        <button
+                            key={f}
+                            onClick={() => onSearch(f)}
+                            disabled={isLoading}
+                            className="px-3 py-1 text-sm font-medium bg-white/10 hover:bg-white/20 text-slate-300 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

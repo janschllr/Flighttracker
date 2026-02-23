@@ -9,6 +9,23 @@ import { Plane, AlertCircle } from 'lucide-react';
 const CACHE_KEY = 'flighttracker-flight';
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
+const RECENT_KEY = 'flighttracker-recent';
+
+function loadRecent() {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY)) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+function addToRecent(flightNumber, current) {
+  const upper = flightNumber.toUpperCase();
+  const updated = [upper, ...current.filter(f => f !== upper)].slice(0, 5);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+  return updated;
+}
+
 function saveToCache(flightNumber, data) {
   localStorage.setItem(CACHE_KEY, JSON.stringify({
     flightNumber: flightNumber.toUpperCase(),
@@ -35,6 +52,7 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [recentFlights, setRecentFlights] = useState(loadRecent);
   const { t } = useLanguage();
 
   const initialFlight = new URLSearchParams(window.location.search).get('flight') ?? '';
@@ -53,6 +71,7 @@ function AppContent() {
         url.searchParams.set('flight', flightNumber.toUpperCase());
         history.pushState({}, '', url);
         saveToCache(flightNumber, result);
+        setRecentFlights(prev => addToRecent(flightNumber, prev));
       } else {
         setError(t('flightNotFound')(flightNumber));
       }
@@ -104,7 +123,7 @@ function AppContent() {
         </div>
 
         <div className="relative z-10">
-          <SearchBar onSearch={handleSearch} isLoading={loading} initialValue={initialFlight} />
+          <SearchBar onSearch={handleSearch} isLoading={loading} initialValue={initialFlight} recentFlights={recentFlights} />
 
           {error && (
             <div className="mt-8 max-w-md mx-auto p-4 bg-red-900/20 border border-red-900/50 rounded-2xl flex items-start gap-3 text-red-400 animate-fade-in">
