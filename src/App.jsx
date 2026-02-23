@@ -115,7 +115,7 @@ function AppContent() {
           <div className="inline-flex items-center justify-center p-3 bg-slate-900/5 dark:bg-white/5 backdrop-blur-md rounded-2xl mb-6 shadow-xl ring-1 ring-slate-900/10 dark:ring-white/10">
             <Plane className="h-8 w-8 text-blue-400" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4 drop-shadow-sm">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4 drop-shadow-sm">
             {t('appTitle')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg font-medium max-w-lg mx-auto">
