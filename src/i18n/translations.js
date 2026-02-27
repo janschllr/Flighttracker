@@ -20,10 +20,13 @@ export const translations = {
 
         // SearchBar
         searchPlaceholder: 'Enter flight number (e.g., LH123)',
+        searchButton: 'Search',
 
         // FlightTicket
         boardingPass: 'Boarding Pass',
         class: 'Class',
+        first: 'First',
+        business: 'Business',
         economy: 'Economy',
         flight: 'Flight',
         date: 'Date',
@@ -36,6 +39,7 @@ export const translations = {
         origin: 'Origin',
         dest: 'Dest',
         tearHere: 'TEAR HERE',
+        localTimeHint: 'All times shown in local airport time',
 
         // Flight Status
         statusOnTime: 'On Time',
@@ -45,6 +49,54 @@ export const translations = {
         statusDelayed: 'Delayed',
         statusDiverted: 'Diverted',
         statusUnknown: 'Unknown',
+
+        // FlightInfo
+        airline: 'Airline',
+        aircraft: 'Aircraft',
+
+        // TimezonePanel
+        localTimes: 'Local Times',
+        tzOrigin: 'Origin',
+        tzDest: 'Dest',
+        sameTimezone: 'Same timezone',
+        flightDuration: 'Flight Duration',
+        noTzChange: 'No timezone change on this route.',
+        tzMathExplain: (change) => `Set your watch ${change} on arrival.`,
+        jetlag: 'Jetlag',
+        jetlagLow: 'Low',
+        jetlagMedium: 'Medium',
+        jetlagHigh: 'High',
+        sleepTip: 'Pro Tip',
+        dayArrival: 'Day arrival',
+        nightArrival: 'Night arrival',
+        day: 'Day',
+        night: 'Night',
+
+        // Sleep tips
+        tipNightMorning1: 'Try to sleep on the plane — you\'ll land fresh in the morning.',
+        tipNightMorning2: 'Bring an eye mask and earplugs for the red-eye.',
+        tipNightMorning3: 'Skip the in-flight movie and get some rest.',
+        tipNightFlight1: 'Set your watch to destination time and sleep accordingly.',
+        tipNightFlight2: 'Stay hydrated and limit caffeine on night flights.',
+        tipNightFlight3: 'A neck pillow makes all the difference on overnight flights.',
+        tipArriveNight1: 'Arrive and go straight to bed — resist the temptation to nap.',
+        tipArriveNight2: 'Take a warm shower on arrival to help you fall asleep.',
+        tipArriveNight3: 'Avoid screens before bed to adjust faster.',
+        tipArriveEvening1: 'Perfect timing — stay up until local bedtime.',
+        tipArriveEvening2: 'A light dinner and early bedtime will help you adjust.',
+        tipArriveEvening3: 'Take a short walk after landing to stay awake until bedtime.',
+        tipMorningEast1: 'You flew east — get sunlight early to reset your clock.',
+        tipMorningEast2: 'Have breakfast at local time, even if you\'re not hungry.',
+        tipMorningEast3: 'Coffee in the morning, but avoid it after noon.',
+        tipAfternoonWest1: 'You flew west — stay active and push through until evening.',
+        tipAfternoonWest2: 'Get outside and soak up daylight this afternoon.',
+        tipAfternoonWest3: 'A short power nap (20 min) is fine, but don\'t oversleep.',
+        tipMorningArr1: 'Great start to the day — grab a coffee and explore.',
+        tipMorningArr2: 'Stay active and avoid napping until evening.',
+        tipMorningArr3: 'Sunlight is your best friend — spend time outdoors.',
+        tipDay1: 'Stay on local time from the moment you land.',
+        tipDay2: 'Drink plenty of water — flying dehydrates you more than you think.',
+        tipDay3: 'A light meal and some movement will help you adjust.',
 
         // FlappyPlane
         clickToFly: 'CLICK TO FLY',
@@ -74,10 +126,13 @@ export const translations = {
 
         // SearchBar
         searchPlaceholder: 'Flugnummer eingeben (z.B. LH123)',
+        searchButton: 'Suchen',
 
         // FlightTicket
         boardingPass: 'Bordkarte',
         class: 'Klasse',
+        first: 'First',
+        business: 'Business',
         economy: 'Economy',
         flight: 'Flug',
         date: 'Datum',
@@ -90,6 +145,7 @@ export const translations = {
         origin: 'Abflug',
         dest: 'Ziel',
         tearHere: 'HIER ABREISSEN',
+        localTimeHint: 'Alle Zeiten in lokaler Flughafenzeit',
 
         // Flight Status
         statusOnTime: 'Pünktlich',
@@ -99,6 +155,54 @@ export const translations = {
         statusDelayed: 'Verspätet',
         statusDiverted: 'Umgeleitet',
         statusUnknown: 'Unbekannt',
+
+        // FlightInfo
+        airline: 'Airline',
+        aircraft: 'Flugzeug',
+
+        // TimezonePanel
+        localTimes: 'Ortszeiten',
+        tzOrigin: 'Abflugsort',
+        tzDest: 'Zielort',
+        sameTimezone: 'Gleiche Zeitzone',
+        flightDuration: 'Flugdauer',
+        noTzChange: 'Kein Zeitzonenwechsel auf dieser Strecke.',
+        tzMathExplain: (change) => `Uhr bei Ankunft ${change} umstellen.`,
+        jetlag: 'Jetlag',
+        jetlagLow: 'Gering',
+        jetlagMedium: 'Mittel',
+        jetlagHigh: 'Stark',
+        sleepTip: 'Tipp',
+        dayArrival: 'Ankunft bei Tag',
+        nightArrival: 'Ankunft bei Nacht',
+        day: 'Tag',
+        night: 'Nacht',
+
+        // Sleep tips
+        tipNightMorning1: 'Versuche im Flugzeug zu schlafen — du landest frisch am Morgen.',
+        tipNightMorning2: 'Schlafmaske und Ohrstöpsel sind Gold wert beim Nachtflug.',
+        tipNightMorning3: 'Lass den Film aus und ruh dich lieber aus.',
+        tipNightFlight1: 'Stelle deine Uhr auf Zielzeit um und schlafe entsprechend.',
+        tipNightFlight2: 'Viel trinken, wenig Koffein bei Nachtflügen.',
+        tipNightFlight3: 'Ein Nackenkissen macht den Unterschied beim Nachtflug.',
+        tipArriveNight1: 'Geh direkt ins Bett — widerstehe der Versuchung zu snacken.',
+        tipArriveNight2: 'Eine warme Dusche hilft beim Einschlafen nach der Landung.',
+        tipArriveNight3: 'Vermeide Bildschirme vor dem Schlafengehen.',
+        tipArriveEvening1: 'Perfektes Timing — bleib wach bis zur lokalen Schlafenszeit.',
+        tipArriveEvening2: 'Leichtes Abendessen und früh ins Bett hilft bei der Umstellung.',
+        tipArriveEvening3: 'Ein kurzer Spaziergang nach der Landung hält dich wach.',
+        tipMorningEast1: 'Du bist nach Osten geflogen — Morgensonne hilft beim Umstellen.',
+        tipMorningEast2: 'Frühstücke zur Ortszeit, auch wenn du keinen Hunger hast.',
+        tipMorningEast3: 'Kaffee am Morgen ja, aber nach Mittag lieber nicht.',
+        tipAfternoonWest1: 'Du bist nach Westen geflogen — bleib aktiv bis zum Abend.',
+        tipAfternoonWest2: 'Geh raus und tanke Tageslicht am Nachmittag.',
+        tipAfternoonWest3: 'Ein kurzes Powernap (20 Min) ist ok, aber verschlaf nicht.',
+        tipMorningArr1: 'Guter Start — schnapp dir einen Kaffee und erkunde die Stadt.',
+        tipMorningArr2: 'Bleib aktiv und vermeide Nickerchen bis zum Abend.',
+        tipMorningArr3: 'Sonnenlicht ist dein bester Freund — verbringe Zeit draußen.',
+        tipDay1: 'Lebe ab Landung nach lokaler Zeit.',
+        tipDay2: 'Trink viel Wasser — Fliegen trocknet mehr aus als man denkt.',
+        tipDay3: 'Leichte Mahlzeit und etwas Bewegung helfen bei der Umstellung.',
 
         // FlappyPlane
         clickToFly: 'KLICK ZUM FLIEGEN',

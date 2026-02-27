@@ -1,4 +1,5 @@
-import { format, addHours } from 'date-fns';
+import { getAirportData } from '../data/airports';
+import { getAircraftName } from '../data/aircrafts';
 
 const API_KEY = import.meta.env.VITE_AVIATION_STACK_KEY;
 const BASE_URL = 'http://api.aviationstack.com/v1/flights';
@@ -23,22 +24,31 @@ export const searchFlight = async (flightNumber) => {
             return null;
         }
 
-        // 3. Transform Data (Take the most recent/relevant flight)
-        // The API returns multiple flights (past/future). We want the one closest to "now".
-        const flight = data.data[0]; // Simplification: Take the first one for now, usually the most relevant active one
+        // 3. Transform Data
+        const flight = data.data[0];
+
+        const depAirport = getAirportData(flight.departure.iata);
+        const arrAirport = getAirportData(flight.arrival.iata);
 
         return {
             flightNumber: flight.flight.iata,
             airline: flight.airline.name,
+            airlineIata: flight.airline.iata,
             origin: {
                 code: flight.departure.iata,
-                city: flight.departure.airport, // API often puts city in airport field or vice versa, need to be careful
-                name: flight.departure.airport
+                city: flight.departure.airport,
+                name: flight.departure.airport,
+                lat: depAirport?.lat ?? null,
+                lng: depAirport?.lng ?? null,
+                timezone: depAirport?.tz ?? null,
             },
             destination: {
                 code: flight.arrival.iata,
                 city: flight.arrival.airport,
-                name: flight.arrival.airport
+                name: flight.arrival.airport,
+                lat: arrAirport?.lat ?? null,
+                lng: arrAirport?.lng ?? null,
+                timezone: arrAirport?.tz ?? null,
             },
             departure: {
                 scheduled: flight.departure.scheduled,
@@ -55,7 +65,7 @@ export const searchFlight = async (flightNumber) => {
                 terminal: flight.arrival.terminal || 'TBD'
             },
             status: mapStatus(flight.flight_status),
-            aircraft: flight.aircraft?.iata || 'Boeing 737' // Fallback if missing
+            aircraft: getAircraftName(flight.aircraft?.iata || flight.aircraft?.icao) || null,
         };
 
     } catch (error) {
@@ -65,7 +75,6 @@ export const searchFlight = async (flightNumber) => {
 };
 
 function mapStatus(apiStatus) {
-    // Map AviationStack status to our UI status
     const statusMap = {
         'scheduled': 'On Time',
         'active': 'In Air',
