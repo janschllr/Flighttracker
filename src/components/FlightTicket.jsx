@@ -195,7 +195,6 @@ export function FlightTicket({ flight }) {
                         )}
                         {/* Cutout circles for perforation effect */}
                         <div className="absolute -left-4 top-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[-50%]" />
-                        <div className="absolute -left-4 bottom-0 w-8 h-8 bg-slate-100 dark:bg-slate-950 rounded-full translate-y-[50%]" />
 
                         <div>
                             <h3 className="text-lg font-bold text-slate-900 mb-6 uppercase tracking-wider">{t('passengerTicket')}</h3>

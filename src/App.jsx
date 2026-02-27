@@ -156,6 +156,10 @@ function AppContent() {
           )}
         </div>
       </main>
+
+      <footer className="text-center py-6 text-sm text-stone-400 dark:text-stone-600">
+        follow <a href="https://github.com/janschllr" target="_blank" rel="noopener noreferrer" className="text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors">@janschllr</a> on GitHub &lt;3
+      </footer>
     </div>
   );
 }
