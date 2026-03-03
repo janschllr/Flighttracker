@@ -5,8 +5,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 
 const GlobeMap = React.lazy(() => import('./GlobeMap'));
 
-export function FlightMapContainer({ flight }) {
-  const { origin, destination } = flight;
+export function FlightMapContainer({ origin, destination }) {
   const [is3D, setIs3D] = useState(false);
   const { t } = useLanguage();
 
@@ -16,22 +15,20 @@ export function FlightMapContainer({ flight }) {
       <div className="absolute top-3 right-3 z-[1100] flex items-center bg-white/80 dark:bg-stone-900/80 backdrop-blur-md rounded-xl ring-1 ring-stone-200/60 dark:ring-white/15 p-0.5 shadow-lg">
         <button
           onClick={() => setIs3D(false)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${
-            !is3D
-              ? 'bg-white dark:bg-white/15 text-stone-900 dark:text-white shadow-sm'
-              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
-          }`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${!is3D
+            ? 'bg-white dark:bg-white/15 text-stone-900 dark:text-white shadow-sm'
+            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+            }`}
         >
           <Map className="h-3 w-3" />
           {t('mapView2D')}
         </button>
         <button
           onClick={() => setIs3D(true)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${
-            is3D
-              ? 'bg-white dark:bg-white/15 text-stone-900 dark:text-white shadow-sm'
-              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
-          }`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${is3D
+            ? 'bg-white dark:bg-white/15 text-stone-900 dark:text-white shadow-sm'
+            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+            }`}
         >
           <Globe className="h-3 w-3" />
           {t('mapView3D')}
@@ -48,10 +45,10 @@ export function FlightMapContainer({ flight }) {
               </div>
             }
           >
-            <GlobeMap flight={flight} />
+            <GlobeMap origin={origin} destination={destination} />
           </Suspense>
         ) : (
-          <FlightMap flight={flight} />
+          <FlightMap origin={origin} destination={destination} />
         )}
       </div>
     </div>

@@ -3,7 +3,6 @@ import { Plane, QrCode } from 'lucide-react';
 import clsx from 'clsx';
 import { FastAverageColor } from 'fast-average-color';
 import { useLanguage } from '../i18n/LanguageContext';
-import { toRealUtc, getFlightProgress } from '../utils/flightProgress';
 
 import { FlappyPlane } from './FlappyPlane';
 
@@ -24,6 +23,22 @@ function extractDate(isoStr) {
 
 function bestTime(...times) {
     return times.find(t => t) || null;
+}
+
+// API returns local airport times tagged as UTC — correct to real UTC
+function toRealUtc(isoStr, timezone) {
+    if (!isoStr || !timezone) return new Date(isoStr);
+    const fakeUtc = new Date(isoStr);
+    // Get the timezone's UTC offset in minutes
+    const utcStr = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', hour: 'numeric', minute: 'numeric', hour12: false }).format(fakeUtc);
+    const locStr = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour: 'numeric', minute: 'numeric', hour12: false }).format(fakeUtc);
+    const [uH, uM] = utcStr.split(':').map(Number);
+    const [lH, lM] = locStr.split(':').map(Number);
+    let offset = (lH * 60 + lM) - (uH * 60 + uM);
+    if (offset > 720) offset -= 1440;
+    if (offset < -720) offset += 1440;
+    // fakeUtc has local time at UTC position, so subtract offset to get real UTC
+    return new Date(fakeUtc.getTime() - offset * 60000);
 }
 
 // Create a simple seeded pseudo-random number generator
@@ -68,7 +83,7 @@ function randomClassAndSeat(flightData) {
     return { cls: 'economy', seat: `${row}${letter}` };
 }
 
-export function FlightTicket({ flight, onBrandColorChange }) {
+export function FlightTicket({ flight, onBrandColorChange, isCapturing }) {
     const { t } = useLanguage();
     const [{ cls, seat }] = React.useState(() => randomClassAndSeat(flight));
     const [logoColor, setLogoColor] = useState('#292524'); // default stone-800
@@ -78,8 +93,23 @@ export function FlightTicket({ flight, onBrandColorChange }) {
 
     if (!flight) return null;
 
-    // Calculate flight progress using shared utility
-    const progress = getFlightProgress(flight);
+    // Calculate flight progress using real UTC times
+    const now = new Date();
+    const departureTime = toRealUtc(flight.departure.actual || flight.departure.estimated || flight.departure.scheduled, flight.origin.timezone);
+    const arrivalTime = toRealUtc(flight.arrival.actual || flight.arrival.estimated || flight.arrival.scheduled, flight.destination.timezone);
+    const totalDuration = arrivalTime - departureTime;
+
+    let progress;
+    if (flight.status === 'Arrived') {
+        progress = 100;
+    } else if (flight.status === 'On Time' && now < departureTime) {
+        progress = 0;
+    } else if (totalDuration <= 0) {
+        progress = 0;
+    } else {
+        const elapsed = now - departureTime;
+        progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+    }
 
     // Map API status to translated status
     const statusMap = {
@@ -118,7 +148,7 @@ export function FlightTicket({ flight, onBrandColorChange }) {
         <>
             {showGame && <FlappyPlane onClose={() => setShowGame(false)} />}
 
-            <div className="w-full max-w-5xl mx-auto mt-8 animate-slide-up px-4" style={{ opacity: 0 }}>
+            <div className={clsx("w-full max-w-5xl mx-auto px-4", isCapturing ? "" : "mt-8 animate-slide-up")} style={isCapturing ? {} : { opacity: 0 }}>
                 <div className="flex flex-col md:flex-row relative overflow-hidden md:overflow-visible">
 
                     {/* Left Side (Main Ticket) */}
@@ -131,13 +161,13 @@ export function FlightTicket({ flight, onBrandColorChange }) {
                         />
 
                         {/* Cutout circles for perforation effect */}
-                        <div className="absolute -right-4 top-0 w-8 h-8 bg-sand-50 dark:bg-[#1a1816] rounded-full translate-y-[-50%]" />
-                        <div className="absolute -right-4 bottom-0 w-8 h-8 bg-sand-50 dark:bg-[#1a1816] rounded-full translate-y-[50%]" />
+                        <div className={clsx("absolute -right-4 top-0 w-8 h-8 rounded-full translate-y-[-50%]", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -right-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%]", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
 
                         {/* Perforation Holes */}
                         <div className="absolute right-[-5px] top-4 bottom-4 flex flex-col justify-between items-center z-10 pointer-events-none">
                             {[...Array(12)].map((_, i) => (
-                                <div key={i} className="w-2 h-2 rounded-full bg-sand-50 dark:bg-[#1a1816]" />
+                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
                             ))}
                         </div>
 
@@ -172,58 +202,69 @@ export function FlightTicket({ flight, onBrandColorChange }) {
                         {/* Flight Route */}
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <div data-iata-code className="text-4xl md:text-5xl font-display font-800 text-stone-900 tracking-tighter leading-none">{flight.origin.code}</div>
+                                <div className={clsx("font-display font-800 text-stone-900 tracking-tighter leading-none", isCapturing ? "text-2xl" : "text-4xl md:text-5xl")}>{flight.origin.code}</div>
                                 <div className="text-stone-500 font-medium text-sm mt-1">{flight.origin.city}</div>
                             </div>
 
                             <div className="flex-1 px-5 md:px-8 flex flex-col items-center">
-                                <div className="w-full flex items-center gap-2 relative">
-                                    <div className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-stone-200" />
-
-                                    {/* Progress Bar Container */}
-                                    <div className="h-[2px] flex-1 bg-stone-200 relative">
-                                        {/* Completed Progress */}
-                                        <div
-                                            data-progress-bar
-                                            className="absolute top-0 left-0 h-full bg-stone-800 transition-all duration-1000 ease-out"
-                                            style={{ width: `${progress}%` }}
-                                        />
-
-                                        {/* Plane Icon */}
-                                        <div
-                                            data-plane-icon
-                                            className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 transition-all duration-1000 ease-out z-10 group cursor-pointer flex items-center justify-center"
-                                            style={{ left: `${progress}%` }}
-                                        >
-                                            <div className="relative flex items-center justify-center">
-                                                <div className="absolute inset-0 bg-sand-400/30 rounded-full blur-md scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#1c1917" stroke="none" className="relative block">
-                                                    <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(45 12 12)"/>
-                                                </svg>
-                                            </div>
-
-                                            {/* Tooltip */}
-                                            <div data-download-hide className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-stone-900 text-white text-xs font-mono font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:-translate-y-0.5 whitespace-nowrap pointer-events-none shadow-xl">
-                                                {Math.round(progress)}%
-                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-900" />
-                                            </div>
+                                {isCapturing ? (
+                                    /* Simplified route line for capture — no CSS transforms */
+                                    <div className="w-full flex items-center gap-2">
+                                        <div className="h-3 w-3 rounded-full bg-stone-400 ring-2 ring-stone-200 shrink-0" />
+                                        <div className="h-[2px] flex-1 bg-stone-300 relative">
+                                            <div className="absolute top-0 left-0 h-full bg-stone-800" style={{ width: `${progress}%` }} />
                                         </div>
+                                        <span className="text-stone-900 text-xl shrink-0 leading-none">✈</span>
+                                        <div className="h-[2px] flex-1 bg-stone-200" />
+                                        <div className="h-3 w-3 rounded-full bg-stone-400 ring-2 ring-stone-200 shrink-0" />
                                     </div>
+                                ) : (
+                                    <>
+                                        <div className="w-full flex items-center gap-2 relative">
+                                            <div className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-stone-200" />
 
-                                    <div className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-stone-200" />
-                                </div>
-                                <div data-download-hide className={clsx(
-                                    "mt-4 px-4 py-1.5 rounded-full text-[11px] font-display font-700 uppercase tracking-[0.15em] border",
-                                    isPositiveStatus
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
-                                        : "bg-red-50 text-red-700 border-red-200/60"
-                                )}>
-                                    {translatedStatus}
-                                </div>
+                                            {/* Progress Bar Container */}
+                                            <div className="h-[2px] flex-1 bg-stone-200 relative">
+                                                {/* Completed Progress */}
+                                                <div
+                                                    className="absolute top-0 left-0 h-full bg-stone-800 transition-all duration-1000 ease-out"
+                                                    style={{ width: `${progress}%` }}
+                                                />
+
+                                                {/* Plane Icon */}
+                                                <div
+                                                    className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-1000 ease-out z-10 group cursor-pointer"
+                                                    style={{ left: `${progress}%` }}
+                                                >
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-sand-400/30 rounded-full blur-md scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                                        <Plane className="h-5 w-5 text-stone-900 fill-stone-900 rotate-90 relative" />
+                                                    </div>
+
+                                                    {/* Tooltip */}
+                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-stone-900 text-white text-xs font-mono font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:-translate-y-0.5 whitespace-nowrap pointer-events-none shadow-xl">
+                                                        {Math.round(progress)}%
+                                                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-900" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-stone-200" />
+                                        </div>
+                                        <div className={clsx(
+                                            "mt-4 px-4 py-1.5 rounded-full text-[11px] font-display font-700 uppercase tracking-[0.15em] border",
+                                            isPositiveStatus
+                                                ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                                                : "bg-red-50 text-red-700 border-red-200/60"
+                                        )}>
+                                            {translatedStatus}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             <div className="text-right">
-                                <div data-iata-code className="text-4xl md:text-5xl font-display font-800 text-stone-900 tracking-tighter leading-none">{flight.destination.code}</div>
+                                <div className={clsx("font-display font-800 text-stone-900 tracking-tighter leading-none", isCapturing ? "text-2xl" : "text-4xl md:text-5xl")}>{flight.destination.code}</div>
                                 <div className="text-stone-500 font-medium text-sm mt-1">{flight.destination.city}</div>
                             </div>
                         </div>
@@ -279,13 +320,13 @@ export function FlightTicket({ flight, onBrandColorChange }) {
                             </div>
                         )}
                         {/* Cutout circle for perforation effect (top & bottom) */}
-                        <div className="absolute -left-4 top-0 w-8 h-8 bg-sand-50 dark:bg-[#1a1816] rounded-full translate-y-[-50%] z-10" />
-                        <div className="absolute -left-4 bottom-0 w-8 h-8 bg-sand-50 dark:bg-[#1a1816] rounded-full translate-y-[50%] z-10" />
+                        <div className={clsx("absolute -left-4 top-0 w-8 h-8 rounded-full translate-y-[-50%] z-10", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -left-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%] z-10", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
 
                         {/* Perforation Holes on Stub edge */}
                         <div className="absolute left-[-5px] top-4 bottom-4 flex flex-col justify-between items-center z-10 pointer-events-none">
                             {[...Array(12)].map((_, i) => (
-                                <div key={i} className="w-2 h-2 rounded-full bg-sand-50 dark:bg-[#1a1816]" />
+                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
                             ))}
                         </div>
 
