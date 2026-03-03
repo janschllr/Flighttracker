@@ -5,7 +5,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 
 const GlobeMap = React.lazy(() => import('./GlobeMap'));
 
-export function FlightMapContainer({ origin, destination }) {
+export function FlightMapContainer({ flight }) {
   const [is3D, setIs3D] = useState(false);
   const { t } = useLanguage();
 
@@ -45,10 +45,10 @@ export function FlightMapContainer({ origin, destination }) {
               </div>
             }
           >
-            <GlobeMap origin={origin} destination={destination} />
+            <GlobeMap flight={flight} />
           </Suspense>
         ) : (
-          <FlightMap origin={origin} destination={destination} />
+          <FlightMap flight={flight} />
         )}
       </div>
     </div>
