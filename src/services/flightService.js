@@ -66,6 +66,7 @@ export const searchFlight = async (flightNumber) => {
             },
             status: mapStatus(flight.flight_status),
             aircraft: getAircraftName(flight.aircraft?.iata || flight.aircraft?.icao) || null,
+            live: flight.live ?? null,
         };
 
     } catch (error) {

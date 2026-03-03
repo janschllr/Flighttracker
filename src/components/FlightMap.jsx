@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getFlightProgress } from '../utils/flightProgress';
 
 // Custom marker icon — white text on dark pin for readability
 function createAirportIcon(label) {
@@ -19,6 +20,31 @@ function createAirportIcon(label) {
     iconSize: [52, 60],
     iconAnchor: [26, 60],
     popupAnchor: [0, -60],
+  });
+}
+
+// Plane icon with rotation support
+function createPlaneIcon(rotation) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" style="transform: rotate(${rotation}deg)">
+    <defs>
+      <filter id="ps" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="1" stdDeviation="2.5" flood-opacity="0.4"/>
+      </filter>
+    </defs>
+    <g filter="url(#ps)">
+      <circle cx="18" cy="18" r="15" fill="#1c1917" opacity="0.92"/>
+      <g transform="translate(18,18) scale(0.7) translate(-18,-18)">
+        <path d="M18 4 L20 14 L30 17 Q31 18 30 19 L20 22 L18 30 Q18 31 18 30 L16 22 L6 19 Q5 18 6 17 L16 14 Z" fill="#c4a882"/>
+        <path d="M16.5 24 L15 28 Q14.5 29 15.5 28.5 L18 26 L20.5 28.5 Q21.5 29 21 28 L19.5 24" fill="#c4a882"/>
+      </g>
+    </g>
+  </svg>`;
+
+  return L.divIcon({
+    html: svg,
+    className: '',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
   });
 }
 
@@ -78,7 +104,17 @@ function adjustForAntimeridian(originLng, destLng) {
   return destLng;
 }
 
-export function FlightMap({ origin, destination }) {
+// Calculate bearing between two points on the curved path
+function getBearing(p1, p2) {
+  const dLng = p2[1] - p1[1];
+  const dLat = p2[0] - p1[0];
+  // atan2 returns angle from east; convert to degrees from north
+  const angle = Math.atan2(dLng, dLat) * (180 / Math.PI);
+  return (angle + 360) % 360;
+}
+
+export function FlightMap({ flight }) {
+  const { origin, destination } = flight;
   const hasCoords = origin.lat != null && origin.lng != null && destination.lat != null && destination.lng != null;
 
   // Adjust destination longitude if route crosses the antimeridian
@@ -102,6 +138,45 @@ export function FlightMap({ origin, destination }) {
 
   const originIcon = useMemo(() => createAirportIcon(origin.code), [origin.code]);
   const destIcon = useMemo(() => createAirportIcon(destination.code), [destination.code]);
+
+  // Calculate plane position and rotation
+  const planeData = useMemo(() => {
+    if (!hasCoords || curvedPath.length === 0) return null;
+
+    const progress = getFlightProgress(flight);
+    if (progress <= 0 || progress >= 100) return null;
+
+    // Use live coordinates if available
+    if (flight.live?.latitude != null && flight.live?.longitude != null) {
+      const liveLng = adjustForAntimeridian(origin.lng, flight.live.longitude);
+      const rotation = flight.live.direction ?? 0;
+      return { position: [flight.live.latitude, liveLng], rotation };
+    }
+
+    // Interpolate on curved path
+    const t = progress / 100;
+    const exactIndex = t * (curvedPath.length - 1);
+    const idx = Math.floor(exactIndex);
+    const frac = exactIndex - idx;
+
+    const p1 = curvedPath[Math.min(idx, curvedPath.length - 1)];
+    const p2 = curvedPath[Math.min(idx + 1, curvedPath.length - 1)];
+
+    const lat = p1[0] + (p2[0] - p1[0]) * frac;
+    const lng = p1[1] + (p2[1] - p1[1]) * frac;
+
+    // Calculate bearing from surrounding points for smoother rotation
+    const prevIdx = Math.max(0, idx - 1);
+    const nextIdx = Math.min(curvedPath.length - 1, idx + 2);
+    const rotation = getBearing(curvedPath[prevIdx], curvedPath[nextIdx]);
+
+    return { position: [lat, lng], rotation };
+  }, [hasCoords, curvedPath, flight, origin.lng]);
+
+  const planeIcon = useMemo(() => {
+    if (!planeData) return null;
+    return createPlaneIcon(planeData.rotation);
+  }, [planeData]);
 
   if (!hasCoords) return null;
 
@@ -131,6 +206,11 @@ export function FlightMap({ origin, destination }) {
 
           <Marker position={originPos} icon={originIcon} />
           <Marker position={destPos} icon={destIcon} />
+
+          {/* Plane marker */}
+          {planeData && planeIcon && (
+            <Marker position={planeData.position} icon={planeIcon} zIndexOffset={1000} />
+          )}
 
           {/* Route line */}
           <Polyline

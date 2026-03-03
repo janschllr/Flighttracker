@@ -81,17 +81,52 @@ function AppContent() {
     setIsGenerating(true);
     try {
       const el = ticketRef.current;
-      // Temporarily ensure full opacity for capture
-      const origOpacity = el.style.opacity;
-      el.style.opacity = '1';
+
+      // 1. Strip animation classes & force full opacity for html2canvas clone
+      const animated = [];
+      for (const node of el.querySelectorAll('*')) {
+        const cls = [...node.classList].filter(c => c.startsWith('animate-'));
+        if (cls.length > 0 || node.style.opacity === '0') {
+          animated.push({ node, classes: cls, opacity: node.style.opacity });
+          cls.forEach(c => node.classList.remove(c));
+          node.style.setProperty('opacity', '1', 'important');
+        }
+      }
+
+      // 2. Hide elements not meant for download (status badge etc.)
+      const hidden = el.querySelectorAll('[data-download-hide]');
+      hidden.forEach(node => node.style.display = 'none');
+
+      // 3. Shrink IATA codes for download
+      const iataCodes = el.querySelectorAll('[data-iata-code]');
+      iataCodes.forEach(node => node.style.fontSize = '1.875rem');
+
+      // 4. Center plane icon & hide progress bar for download
+      const planeIcon = el.querySelector('[data-plane-icon]');
+      const planeOrigLeft = planeIcon?.style.left;
+      if (planeIcon) planeIcon.style.left = '50%';
+
+      const progressBar = el.querySelector('[data-progress-bar]');
+      if (progressBar) progressBar.style.display = 'none';
+
       const canvas = await html2canvas(el, {
         scale: 3,
-        backgroundColor: '#f7f3ec',
+        backgroundColor: null,
         useCORS: true,
         logging: false,
         allowTaint: false,
       });
-      el.style.opacity = origOpacity;
+
+      // Restore everything
+      animated.forEach(({ node, classes, opacity }) => {
+        classes.forEach(c => node.classList.add(c));
+        node.style.removeProperty('opacity');
+        if (opacity) node.style.opacity = opacity;
+      });
+      hidden.forEach(node => node.style.display = '');
+      iataCodes.forEach(node => node.style.fontSize = '');
+      if (planeIcon) planeIcon.style.left = planeOrigLeft;
+      if (progressBar) progressBar.style.display = '';
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -245,7 +280,7 @@ function AppContent() {
               </div>
               <div className="flex flex-col lg:flex-row gap-4 mt-4 max-w-5xl mx-auto px-4">
                 <div className="flex-1 min-w-0">
-                  <FlightMapContainer origin={flight.origin} destination={flight.destination} />
+                  <FlightMapContainer flight={flight} />
                 </div>
                 {(flight.origin.timezone && flight.destination.timezone) && (
                   <div
