@@ -161,13 +161,13 @@ export function FlightTicket({ flight, onBrandColorChange, isCapturing }) {
                         />
 
                         {/* Cutout circles for perforation effect */}
-                        <div className={clsx("absolute -right-4 top-0 w-8 h-8 rounded-full translate-y-[-50%]", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
-                        <div className={clsx("absolute -right-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%]", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -right-4 top-0 w-8 h-8 rounded-full translate-y-[-50%]", isCapturing ? "bg-transparent" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -right-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%]", isCapturing ? "bg-transparent" : "bg-sand-50 dark:bg-[#1a1816]")} />
 
                         {/* Perforation Holes */}
                         <div className="absolute right-[-5px] top-4 bottom-4 flex flex-col justify-between items-center z-10 pointer-events-none">
                             {[...Array(12)].map((_, i) => (
-                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-stone-300" : "bg-sand-50 dark:bg-[#1a1816]")} />
                             ))}
                         </div>
 
@@ -320,13 +320,13 @@ export function FlightTicket({ flight, onBrandColorChange, isCapturing }) {
                             </div>
                         )}
                         {/* Cutout circle for perforation effect (top & bottom) */}
-                        <div className={clsx("absolute -left-4 top-0 w-8 h-8 rounded-full translate-y-[-50%] z-10", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
-                        <div className={clsx("absolute -left-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%] z-10", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -left-4 top-0 w-8 h-8 rounded-full translate-y-[-50%] z-10", isCapturing ? "bg-transparent" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                        <div className={clsx("absolute -left-4 bottom-0 w-8 h-8 rounded-full translate-y-[50%] z-10", isCapturing ? "bg-transparent" : "bg-sand-50 dark:bg-[#1a1816]")} />
 
                         {/* Perforation Holes on Stub edge */}
                         <div className="absolute left-[-5px] top-4 bottom-4 flex flex-col justify-between items-center z-10 pointer-events-none">
                             {[...Array(12)].map((_, i) => (
-                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-[#f7f3ec]" : "bg-sand-50 dark:bg-[#1a1816]")} />
+                                <div key={i} className={clsx("w-2 h-2 rounded-full", isCapturing ? "bg-stone-300" : "bg-sand-50 dark:bg-[#1a1816]")} />
                             ))}
                         </div>
 
