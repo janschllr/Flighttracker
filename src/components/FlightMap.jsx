@@ -69,11 +69,26 @@ function getCurvedPath(from, to, segments = 50) {
   return points;
 }
 
+// Adjust destination longitude for antimeridian crossing so both markers
+// appear on the same world copy in Leaflet
+function adjustForAntimeridian(originLng, destLng) {
+  let dLng = destLng - originLng;
+  if (dLng > 180) return destLng - 360;
+  if (dLng < -180) return destLng + 360;
+  return destLng;
+}
+
 export function FlightMap({ origin, destination }) {
   const hasCoords = origin.lat != null && origin.lng != null && destination.lat != null && destination.lng != null;
 
+  // Adjust destination longitude if route crosses the antimeridian
+  const adjustedDestLng = useMemo(() => {
+    if (!hasCoords) return destination.lng;
+    return adjustForAntimeridian(origin.lng, destination.lng);
+  }, [hasCoords, origin.lng, destination.lng]);
+
   const originPos = useMemo(() => hasCoords ? [origin.lat, origin.lng] : null, [hasCoords, origin.lat, origin.lng]);
-  const destPos = useMemo(() => hasCoords ? [destination.lat, destination.lng] : null, [hasCoords, destination.lat, destination.lng]);
+  const destPos = useMemo(() => hasCoords ? [destination.lat, adjustedDestLng] : null, [hasCoords, destination.lat, adjustedDestLng]);
 
   const bounds = useMemo(() => {
     if (!originPos || !destPos) return null;
@@ -91,11 +106,7 @@ export function FlightMap({ origin, destination }) {
   if (!hasCoords) return null;
 
   return (
-    <div
-      className="w-full animate-fade-in-up stagger-3"
-      style={{ opacity: 0, height: '480px' }}
-    >
-      <div className="relative rounded-2xl overflow-hidden shadow-[0_15px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.4)] ring-1 ring-stone-200/50 dark:ring-white/5 h-full">
+    <div className="w-full h-full relative">
         <MapContainer
           center={[0, 0]}
           zoom={2}
@@ -104,6 +115,7 @@ export function FlightMap({ origin, destination }) {
           dragging={true}
           zoomControl={false}
           attributionControl={false}
+          worldCopyJump={false}
           style={{ height: '100%', width: '100%', background: '#f5f0e8' }}
           className="flight-map"
         >
@@ -133,14 +145,13 @@ export function FlightMap({ origin, destination }) {
           />
         </MapContainer>
 
-        {/* Subtle edge fade */}
-        <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-black/10 to-transparent pointer-events-none z-[999]" />
-        <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-black/10 to-transparent pointer-events-none z-[999]" />
+      {/* Subtle edge fade */}
+      <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-black/10 to-transparent pointer-events-none z-[999]" />
+      <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-black/10 to-transparent pointer-events-none z-[999]" />
 
-        {/* Attribution */}
-        <div className="absolute bottom-1 right-2 text-[9px] text-stone-400/60 z-[1000] pointer-events-none">
-          OpenStreetMap &middot; CARTO
-        </div>
+      {/* Attribution */}
+      <div className="absolute bottom-1 right-2 text-[9px] text-stone-400/60 z-[1000] pointer-events-none">
+        OpenStreetMap &middot; CARTO
       </div>
     </div>
   );

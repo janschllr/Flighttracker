@@ -53,3 +53,8 @@
 .flight-map .leaflet-control-zoom {
   display: none;
 }
+
+/* Globe container */
+.globe-container canvas {
+  border-radius: 1rem;
+}

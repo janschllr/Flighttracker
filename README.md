@@ -15,9 +15,12 @@ Ein moderner Echtzeit-Flugtracker mit einer eleganten Boarding-Pass-UI. Verfolge
 - 🌐 **Zweisprachig** – Deutsch & Englisch wählbar
 - 🌙 **Dark Mode** – Helles & dunkles Theme mit Toggle
 - 🗺️ **Flugkarte** – Interaktive Leaflet-Karte mit Flugroute zwischen Abflug- und Zielflughafen
-- 🕐 **Zeitzonen-Panel** – Live-Uhren für Abflug- und Zielort mit Zeitdifferenz
+- 🌍 **3D-Globus** – Umschaltbarer 3D-Globus mit animiertem Flugbogen (globe.gl), Lazy-Loading für optimale Performance
+- 🕐 **Zeitzonen-Panel** – Live-Uhren für Abflug- und Zielort mit Zeitdifferenz, Jetlag-Einschätzung und Schlaftipps
 - ✈️ **Flugzeuginfo** – Detaillierte Flugzeugtyp-Erkennung und intelligente Fluginformationen mit Fehlerkorrektur
 - 💺 **Sitzplatz-Simulation** – Generiert konsistent für jeden Flug eine zufällige, passende Buchungsklasse und Sitzplatznummer
+- 🏆 **Achievement Badges** – Persistente Abzeichen-Sammlung (Langstrecken-Held, Nachteule, Weltenbummler, Nachtflug) mit Toast-Benachrichtigungen und Trophenvitrine
+- 📥 **Boarding-Pass Download** – Exportiert das Ticket als hochauflösendes PNG-Bild
 - 🕑 **Letzte Suchen** – Bis zu 5 zuletzt gesuchte Flüge als Schnellzugriff
 - 💾 **Caching** – Client-seitiges Caching und URL-Parameter für direkten Flug-Link
 - ✂️ **Abreiß-Animation** – Interaktiver Ticket-Stub mit Tear-Off-Effekt, dynamischem Schatten und Stanzlöchern
@@ -31,7 +34,9 @@ Ein moderner Echtzeit-Flugtracker mit einer eleganten Boarding-Pass-UI. Verfolge
 | React 19 | Frontend Framework |
 | Vite 7 | Build Tool & Dev Server |
 | Tailwind CSS 3 | Styling |
-| Leaflet + React-Leaflet | Interaktive Flugkarte |
+| Leaflet + React-Leaflet | Interaktive 2D-Flugkarte |
+| globe.gl | 3D-Globus mit animiertem Flugbogen |
+| html2canvas | Boarding-Pass-Export als PNG |
 | AviationStack API | Flugdaten |
 | fast-average-color | Dynamische Farb-Extraktion aus Airline Logos |
 | lucide-react | UI Icons |
@@ -78,9 +83,12 @@ A modern real-time flight tracker with an elegant boarding pass UI. Track any fl
 - 🌐 **Bilingual** – German & English selectable
 - 🌙 **Dark Mode** – Light & dark theme with toggle
 - 🗺️ **Flight Map** – Interactive Leaflet map showing the flight route between departure and arrival airports
-- 🕐 **Timezone Panel** – Live clocks for departure and destination with time difference
+- 🌍 **3D Globe** – Toggleable 3D globe with animated flight arc (globe.gl), lazy-loaded for optimal performance
+- 🕐 **Timezone Panel** – Live clocks for departure and destination with time difference, jetlag assessment and sleep tips
 - ✈️ **Aircraft Info** – Detailed aircraft type recognition and intelligent flight information with error correction
 - 💺 **Seat Simulation** – Consistently generates a random, appropriate booking class and seat number for each flight
+- 🏆 **Achievement Badges** – Persistent badge collection (Long Haul Survivor, Night Owl, Globe Trotter, Red Eye) with toast notifications and trophy case
+- 📥 **Boarding Pass Download** – Export the ticket as a high-resolution PNG image
 - 🕑 **Recent Searches** – Up to 5 recently searched flights as quick access
 - 💾 **Caching** – Client-side caching and URL parameters for direct flight links
 - ✂️ **Tear-off Animation** – Interactive ticket stub with tear-off effect, dynamic shadow, and perforation holes
@@ -94,7 +102,9 @@ A modern real-time flight tracker with an elegant boarding pass UI. Track any fl
 | React 19 | Frontend Framework |
 | Vite 7 | Build Tool & Dev Server |
 | Tailwind CSS 3 | Styling |
-| Leaflet + React-Leaflet | Interactive Flight Map |
+| Leaflet + React-Leaflet | Interactive 2D Flight Map |
+| globe.gl | 3D Globe with animated flight arc |
+| html2canvas | Boarding pass export as PNG |
 | AviationStack API | Flight Data |
 | fast-average-color | Dynamic color extraction from airline logos |
 | lucide-react | UI Icons |

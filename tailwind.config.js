@@ -36,6 +36,7 @@ export default {
         'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
         'slide-up': 'slideUp 0.8s ease-out forwards',
         'pulse-soft': 'pulseSoft 4s ease-in-out infinite',
+        'badge-pop': 'badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
       },
       keyframes: {
         fadeIn: {
@@ -53,6 +54,11 @@ export default {
         pulseSoft: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.6' },
+        },
+        badgePop: {
+          '0%': { opacity: '0', transform: 'scale(0.5)' },
+          '60%': { opacity: '1', transform: 'scale(1.08)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
     },

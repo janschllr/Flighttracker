@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Plane, QrCode } from 'lucide-react';
 import clsx from 'clsx';
 import { FastAverageColor } from 'fast-average-color';
@@ -88,6 +88,8 @@ export function FlightTicket({ flight, onBrandColorChange }) {
     const [{ cls, seat }] = React.useState(() => randomClassAndSeat(flight));
     const [logoColor, setLogoColor] = useState('#292524'); // default stone-800
     const imgRef = useRef(null);
+    const [isTorn, setIsTorn] = React.useState(false);
+    const [showGame, setShowGame] = React.useState(false);
 
     if (!flight) return null;
 
@@ -108,9 +110,6 @@ export function FlightTicket({ flight, onBrandColorChange }) {
         const elapsed = now - departureTime;
         progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
     }
-
-    const [isTorn, setIsTorn] = React.useState(false);
-    const [showGame, setShowGame] = React.useState(false);
 
     // Map API status to translated status
     const statusMap = {
@@ -363,7 +362,7 @@ export function FlightTicket({ flight, onBrandColorChange }) {
                         >
                             <div className="flex gap-[2px] h-full w-full px-3 items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity">
                                 {[...Array(45)].map((_, i) => (
-                                    <div key={i} className="bg-white/80 h-full" style={{ width: Math.random() > 0.5 ? 1.5 : 3.5, opacity: Math.random() > 0.3 ? 1 : 0.6 }} />
+                                    <div key={i} className="bg-white/80 h-full" style={{ width: seededRandom(i * 7 + 3) > 0.5 ? 1.5 : 3.5, opacity: seededRandom(i * 13 + 7) > 0.3 ? 1 : 0.6 }} />
                                 ))}
                             </div>
                         </div>

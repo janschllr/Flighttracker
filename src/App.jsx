@@ -4,11 +4,15 @@ import { FlightTicket } from './components/FlightTicket';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 import { ThemeProvider } from './ThemeContext';
-import { FlightMap } from './components/FlightMap';
+import { FlightMapContainer } from './components/FlightMapContainer';
 import { TimezonePanel } from './components/TimezonePanel';
 import { FlightInfo } from './components/FlightInfo';
 import { searchFlight } from './services/flightService';
-import { AlertCircle, Search, MapPin, Route } from 'lucide-react';
+import { loadBadges, saveBadges, checkBadges, incrementSearchCount } from './services/badgeService';
+import { BadgeNotification } from './components/BadgeNotification';
+import { BadgeTrophyCase } from './components/BadgeTrophyCase';
+import { AlertCircle, Search, MapPin, Route, Trophy, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 const CACHE_KEY = 'flighttracker-flight';
 const CACHE_VERSION = 2; // bump to invalidate old cache
@@ -63,9 +67,45 @@ function AppContent() {
   const [hasSearched, setHasSearched] = useState(false);
   const [recentFlights, setRecentFlights] = useState(loadRecent);
   const [brandColor, setBrandColor] = useState(null);
+  const [badges, setBadges] = useState(loadBadges);
+  const [newBadge, setNewBadge] = useState(null);
+  const [showTrophyCase, setShowTrophyCase] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const ticketRef = React.useRef(null);
   const { t } = useLanguage();
 
   const initialFlight = new URLSearchParams(window.location.search).get('flight') ?? '';
+
+  const handleDownload = async () => {
+    if (!ticketRef.current || !flight) return;
+    setIsGenerating(true);
+    try {
+      const el = ticketRef.current;
+      // Temporarily ensure full opacity for capture
+      const origOpacity = el.style.opacity;
+      el.style.opacity = '1';
+      const canvas = await html2canvas(el, {
+        scale: 3,
+        backgroundColor: '#f7f3ec',
+        useCORS: true,
+        logging: false,
+        allowTaint: false,
+      });
+      el.style.opacity = origOpacity;
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `boarding-pass-${flight.flightNumber}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    } catch (err) {
+      console.error('Failed to generate boarding pass:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSearch = async (flightNumber) => {
     setLoading(true);
@@ -83,6 +123,16 @@ function AppContent() {
         history.pushState({}, '', url);
         saveToCache(flightNumber, result);
         setRecentFlights(prev => addToRecent(flightNumber, prev));
+        // Check for new badges
+        const searchCount = incrementSearchCount();
+        const currentBadges = loadBadges();
+        const earned = checkBadges(result, currentBadges, searchCount);
+        if (earned.length > 0) {
+          const updated = [...currentBadges, ...earned];
+          saveBadges(updated);
+          setBadges(updated);
+          setNewBadge(earned[0]);
+        }
       } else {
         setError(t('flightNotFound')(flightNumber));
       }
@@ -124,6 +174,35 @@ function AppContent() {
 
       <LanguageSwitcher />
 
+      {/* Download pass button — fixed below language switcher */}
+      {flight && (
+        <div className="fixed top-16 right-4 z-50">
+          <button
+            onClick={handleDownload}
+            disabled={isGenerating}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/60 dark:bg-white/[0.06] backdrop-blur-md rounded-xl ring-1 ring-stone-200/50 dark:ring-white/10 shadow-lg hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-200 group disabled:opacity-50"
+          >
+            <Download className="h-4 w-4 text-stone-500 dark:text-stone-400 group-hover:text-sand-500 transition-colors" />
+            <span className="hidden sm:inline text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-700 dark:group-hover:text-stone-200 transition-colors">
+              {isGenerating ? t('generating') : t('downloadPass')}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Trophy button */}
+      <button
+        onClick={() => setShowTrophyCase(true)}
+        className="fixed top-4 left-4 z-40 p-2.5 rounded-xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-md ring-1 ring-stone-200/50 dark:ring-white/10 hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-200 group"
+      >
+        <Trophy className="h-4 w-4 text-stone-500 dark:text-stone-400 group-hover:text-sand-500 transition-colors" />
+        {badges.length > 0 && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-sand-500 text-white text-[9px] font-bold flex items-center justify-center">
+            {badges.length}
+          </span>
+        )}
+      </button>
+
       <main className="container mx-auto px-4 pt-10 pb-8 md:pt-14 md:pb-10 max-w-5xl">
         {/* Header — compact, no icon */}
         <div className="text-center mb-8 md:mb-10 animate-fade-in" style={{ opacity: 0 }}>
@@ -161,10 +240,12 @@ function AppContent() {
 
           {flight && (
             <>
-              <FlightTicket flight={flight} onBrandColorChange={setBrandColor} />
+              <div ref={ticketRef}>
+                <FlightTicket flight={flight} onBrandColorChange={setBrandColor} />
+              </div>
               <div className="flex flex-col lg:flex-row gap-4 mt-4 max-w-5xl mx-auto px-4">
                 <div className="flex-1 min-w-0">
-                  <FlightMap origin={flight.origin} destination={flight.destination} />
+                  <FlightMapContainer origin={flight.origin} destination={flight.destination} />
                 </div>
                 {(flight.origin.timezone && flight.destination.timezone) && (
                   <div
@@ -215,6 +296,16 @@ function AppContent() {
 
       {/* Bottom fade for polish */}
       <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-sand-50 dark:from-[#1a1816] to-transparent pointer-events-none -z-5" />
+
+      {/* Badge notification */}
+      {newBadge && (
+        <BadgeNotification badge={newBadge} onDismiss={() => setNewBadge(null)} />
+      )}
+
+      {/* Trophy case modal */}
+      {showTrophyCase && (
+        <BadgeTrophyCase badges={badges} onClose={() => setShowTrophyCase(false)} />
+      )}
     </div>
   );
 }

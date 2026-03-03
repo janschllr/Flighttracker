@@ -103,6 +103,52 @@ export const translations = {
         gameOver: 'GAME OVER',
         score: 'Score',
         restartHint: 'Click or Space to Restart',
+
+        // Badges
+        badgeTrophyCase: 'Trophy Case',
+        badgeEarned: 'Earned',
+        badgeNotYet: 'Not yet earned',
+        badgeNewUnlock: 'Badge unlocked!',
+        badgeEarnedOn: (flight) => `Flight ${flight}`,
+        // Easy
+        badgeFirstFlight: 'First Flight',
+        badgeFirstFlightDesc: 'Searched your first flight',
+        badgeEarlyBird: 'Early Bird',
+        badgeEarlyBirdDesc: 'Departure between 5 and 7 AM',
+        badgeSmoothLanding: 'Smooth Landing',
+        badgeSmoothLandingDesc: 'Found a flight that has landed',
+        badgeShortHop: 'Short Hop',
+        badgeShortHopDesc: 'Flight shorter than 2 hours',
+        // Medium
+        badgeNightOwl: 'Night Owl',
+        badgeNightOwlDesc: 'Departed between midnight and 5 AM',
+        badgeRedEye: 'Red Eye',
+        badgeRedEyeDesc: 'Night flight arriving early morning',
+        badgeDelaySurvivor: 'Delay Survivor',
+        badgeDelaySurvivorDesc: 'Found a delayed flight',
+        badgeEquatorCrosser: 'Equator Crosser',
+        badgeEquatorCrosserDesc: 'Flight crossing the equator',
+        badgeFrequentFlyer: 'Frequent Flyer',
+        badgeFrequentFlyerDesc: 'Searched 10 different flights',
+        // Hard
+        badgeLongHaul: 'Long Haul Survivor',
+        badgeLongHaulDesc: 'Survived a flight longer than 12 hours',
+        badgeGlobeTrotter: 'Globe Trotter',
+        badgeGlobeTrotterDesc: 'Crossed more than 6 timezone hours',
+        badgeGhostFlight: 'Ghost Flight',
+        badgeGhostFlightDesc: 'Found a cancelled flight',
+        badgeJumboJet: 'Jumbo Jet',
+        badgeJumboJetDesc: 'Flight on an A380 or Boeing 747',
+        badgeAntipodean: 'Antipodean',
+        badgeAntipodeanDesc: 'Flight to the other side of the world',
+
+        // Map toggle
+        mapView2D: '2D Map',
+        mapView3D: '3D Globe',
+
+        // Download
+        downloadPass: 'Download Pass',
+        generating: 'Generating...',
     },
 
     de: {
@@ -209,5 +255,51 @@ export const translations = {
         gameOver: 'SPIEL VORBEI',
         score: 'Punkte',
         restartHint: 'Klick oder Leertaste zum Neustarten',
+
+        // Badges
+        badgeTrophyCase: 'Trophenvitrine',
+        badgeEarned: 'Verdient',
+        badgeNotYet: 'Noch nicht verdient',
+        badgeNewUnlock: 'Abzeichen freigeschaltet!',
+        badgeEarnedOn: (flight) => `Flug ${flight}`,
+        // Easy
+        badgeFirstFlight: 'Erster Flug',
+        badgeFirstFlightDesc: 'Ersten Flug gesucht',
+        badgeEarlyBird: 'Frühaufsteher',
+        badgeEarlyBirdDesc: 'Abflug zwischen 5 und 7 Uhr',
+        badgeSmoothLanding: 'Sanfte Landung',
+        badgeSmoothLandingDesc: 'Einen gelandeten Flug gefunden',
+        badgeShortHop: 'Kurzstrecke',
+        badgeShortHopDesc: 'Flug kürzer als 2 Stunden',
+        // Medium
+        badgeNightOwl: 'Nachteule',
+        badgeNightOwlDesc: 'Zwischen Mitternacht und 5 Uhr abgeflogen',
+        badgeRedEye: 'Nachtflug',
+        badgeRedEyeDesc: 'Nachtflug mit Ankunft am frühen Morgen',
+        badgeDelaySurvivor: 'Verspätungs-Held',
+        badgeDelaySurvivorDesc: 'Einen verspäteten Flug gefunden',
+        badgeEquatorCrosser: 'Äquator-Überquerer',
+        badgeEquatorCrosserDesc: 'Flug über den Äquator',
+        badgeFrequentFlyer: 'Vielflieger',
+        badgeFrequentFlyerDesc: '10 verschiedene Flüge gesucht',
+        // Hard
+        badgeLongHaul: 'Langstrecken-Held',
+        badgeLongHaulDesc: 'Einen Flug von über 12 Stunden überstanden',
+        badgeGlobeTrotter: 'Weltenbummler',
+        badgeGlobeTrotterDesc: 'Mehr als 6 Zeitzonen überquert',
+        badgeGhostFlight: 'Geisterflug',
+        badgeGhostFlightDesc: 'Einen gestrichenen Flug gefunden',
+        badgeJumboJet: 'Jumbo Jet',
+        badgeJumboJetDesc: 'Flug mit einem A380 oder Boeing 747',
+        badgeAntipodean: 'Antipode',
+        badgeAntipodeanDesc: 'Flug auf die andere Seite der Welt',
+
+        // Map toggle
+        mapView2D: '2D Karte',
+        mapView3D: '3D Globus',
+
+        // Download
+        downloadPass: 'Bordkarte laden',
+        generating: 'Wird erstellt...',
     }
 };
